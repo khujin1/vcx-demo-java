@@ -61,6 +61,8 @@ dependencies {
         exclude module: "logback-classic"
     }
     compile 'org.projectreactor:reactor-spring:1.0.1.RELEASE'
+    //testCompile('org.springframework.boot:spring-boot-starter-test')
+    //testCompile('io.projectreactor:reactor-test')
 }
 
 task faber(type:JavaExec) {

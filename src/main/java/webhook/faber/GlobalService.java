@@ -6,6 +6,7 @@ import com.evernym.sdk.vcx.utils.UtilsApi;
 import com.evernym.sdk.vcx.vcx.VcxApi;
 import com.evernym.sdk.vcx.wallet.WalletApi;
 import com.jayway.jsonpath.JsonPath;
+import org.apache.commons.cli.CommandLine;
 import org.springframework.stereotype.Service;
 import utils.Common;
 
@@ -14,8 +15,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
+import utils.Common;
+
 import static utils.Common.getRandomInt;
 import static utils.Common.prettyJson;
+
 
 @Service
 public class GlobalService {
@@ -23,6 +27,8 @@ public class GlobalService {
     static final Logger logger = Common.getDemoLogger();
 
     static final String webhookUrl = "http://localhost:7201/notifications";
+
+
 
     // node agency is not support vcxUpdateWebhookUrl currently
     // therefore we directly communicate with agency for now
@@ -33,6 +39,11 @@ public class GlobalService {
     public void initialize() throws Exception {
         logger.info("#0 Initialize");
         Common.loadNullPayPlugin();
+/*
+        CommandLine options = Common.getCommandLine(args);
+        if (options == null) System.exit(0);
+
+        */
 
         long utime = System.currentTimeMillis() / 1000;
         String provisionConfig  = JsonPath.parse("{" +
@@ -49,7 +60,20 @@ public class GlobalService {
         // Communication method. aries.
         provisionConfig = JsonPath.parse(provisionConfig).put("$", "protocol_type", "3.0").jsonString();
         logger.info("Running with Aries VCX Enabled! Make sure VCX agency is configured to use protocol_type 3.0");
+/*
+        if (options.hasOption("postgres")) {
+            Common.loadPostgresPlugin();
+            provisionConfig = JsonPath.parse(provisionConfig).put("$", "wallet_type", "postgres_storage")
+                    .put("$", "storage_config", "{\"url\":\"localhost:5432\"}")
+                    .put("$", "storage_credentials", "{\"account\":\"postgres\",\"password\":\"mysecretpassword\"," +
+                            "\"admin_account\":\"postgres\",\"admin_password\":\"mysecretpassword\"}").jsonString();
+            logger.info("Running with PostreSQL wallet enabled! Config = " + JsonPath.read(provisionConfig, "$.storage_config"));
+        } else {
+            logger.info("Running with builtin wallet.");
+        }
 
+
+ */
         // add webhook url to config
         provisionConfig = JsonPath.parse(provisionConfig).put("$", "webhook_url", webhookUrl).jsonString();
         logger.info("Running with webhook notifications enabled! Webhook url = " + webhookUrl);
